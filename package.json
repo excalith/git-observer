@@ -1,0 +1,21 @@
+{
+  "name": "dev-companion",
+  "version": "1.0.0",
+  "description": "A companion app for developers to reach out issues and commits on browser",
+  "main": "cli.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "Can Cellek",
+  "license": "MIT",
+  "dependencies": {
+    "opn": "^5.3.0"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/excalith/Dev-Companion.git"
+},
+  "bin": {
+    "companion": "./cli.js"
+  }
+}
