@@ -8,6 +8,21 @@
     <img src="screenshot.gif">
 </p>
 
+<p align="center">
+	<a href="https://travis-ci.org/excalith/Git-Observer">
+		<img alt="Build Status" height="18" src="https://img.shields.io/travis/excalith/Git-Observer.svg">
+	</a>
+	<a href="https://github.com/excalith/Git-Observer/issues">
+		<img alt="Build Status" height="18" src="https://img.shields.io/github/issues/excalith/Git-Observer.svg">
+	</a>
+	<a href="https://github.com/excalith/Git-Observer/stargazers">
+		<img alt="Stars" height="18" src="https://img.shields.io/github/stars/excalith/Git-Observer.svg">
+	</a>
+	<a href="https://github.com/excalith/Git-Observer/network">
+		<img alt="Forks" height="18" src="https://img.shields.io/github/forks/excalith/Git-Observer.svg">
+	</a>
+</p>
+
 <hr/>
 
 **Git Observer** is a simple terminal application where you can launch project related pages right from your terminal. It allows you to save and switch projects from your terminal allowing you to launch corresponding pages directly.

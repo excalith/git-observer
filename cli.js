@@ -4,7 +4,6 @@ const Configstore = require('configstore')
 const inquirer = require('inquirer')
 const chalk = require('chalk')
 const pkg = require('./package.json')
-const [, , ...args] = process.argv
 
 const conf = new Configstore(pkg.name, {
 	isConfirmed: 'No',
@@ -25,16 +24,13 @@ function AddProject() {
 	console.log('')
 	console.log(
 		chalk.white.bold('Project Commits Example: ') +
-			'https://github.com/User/RepoName/commit/',
-	)
+		'https://github.com/User/RepoName/commit/')
 	console.log(
 		chalk.white.bold('Project Issues Example: ') +
-			'https://github.com/User/RepoName/issues/',
-	)
+		'https://github.com/User/RepoName/issues/')
 	console.log(
 		chalk.white.bold('Project Issues Example: ') +
-			'https://github.com/User/RepoName/pull/',
-	)
+		'https://github.com/User/RepoName/pull/')
 	console.log('')
 	inquirer
 		.prompt([
@@ -42,31 +38,31 @@ function AddProject() {
 				message: 'Project Name:',
 				type: 'input',
 				name: 'projectName',
-				validate: validateString,
+				validate: validateString
 			},
 			{
 				message: 'Project Commits:',
 				type: 'input',
 				name: 'commitLink',
-				validate: validateLink,
+				validate: validateLink
 			},
 			{
 				message: 'Project Issues:',
 				type: 'input',
 				name: 'issueLink',
-				validate: validateLink,
+				validate: validateLink
 			},
 			{
 				message: 'Project Pull-Requests:',
 				type: 'input',
 				name: 'pullRequestLink',
-				validate: validateLink,
+				validate: validateLink
 			},
 			{
 				message: 'Are your choices correct?',
 				type: 'list',
 				name: 'isConfirmed',
-				choices: ['Yes', 'No'],
+				choices: ['Yes', 'No']
 			},
 		])
 		.then(answers => {
@@ -78,15 +74,15 @@ function AddProject() {
 
 				conf.set(
 					'projects.' + answers.projectName + '.commitLink',
-					answers.commitLink,
+					answers.commitLink
 				)
 				conf.set(
 					'projects.' + answers.projectName + '.issueLink',
-					answers.issueLink,
+					answers.issueLink
 				)
 				conf.set(
 					'projects.' + answers.projectName + '.pullRequestLink',
-					answers.pullRequestLink,
+					answers.pullRequestLink
 				)
 
 				console.log('')
@@ -111,12 +107,12 @@ function GetProjects() {
 				message: 'Choose your project',
 				type: 'list',
 				name: 'projectName',
-				choices: projects,
+				choices: projects
 			},
 		])
 		.then(answers => {
 			if (answers.projectName == 'Exit') {
-				console.log("You didn't select a project")
+				console.log('You didn\'t select a project')
 				console.log('')
 			} else {
 				conf.set('lastProject', answers.projectName)
@@ -139,20 +135,19 @@ function DeleteProject() {
 				message: 'Choose a project to delete',
 				type: 'list',
 				name: 'projectName',
-				choices: projects,
+				choices: projects
 			},
 		])
 		.then(answers => {
 			if (answers.projectName == 'Exit') {
-				console.log("You didn't delete any project")
+				console.log('You didn\'t delete any project')
 				console.log('')
 			} else {
 				conf.delete('projects.' + answers.projectName)
 				console.log(
 					'You have deleted ' +
-						chalk.red(answers.projectName) +
-						' from settings',
-				)
+					chalk.red(answers.projectName) +
+					' from settings')
 				console.log('')
 			}
 		})
@@ -218,11 +213,11 @@ function openLink(link, linkType, command) {
 	} else {
 		console.log(
 			'Opening ' +
-				linkType +
-				': ' +
-				command +
-				' of project ' +
-				conf.get('lastProject'),
+			linkType +
+			': ' +
+			command +
+			' of project ' +
+			conf.get('lastProject')
 		)
 		opn(link + command)
 	}
@@ -259,7 +254,7 @@ function validateString(str) {
  * @param  {String} str String to validate
  */
 function validateLink(str) {
-	regexp = /^(?:(?:https?|ftp):\/\/)?(?:(?!(?:10|127)(?:\.\d{1,3}){3})(?!(?:169\.254|192\.168)(?:\.\d{1,3}){2})(?!172\.(?:1[6-9]|2\d|3[0-1])(?:\.\d{1,3}){2})(?:[1-9]\d?|1\d\d|2[01]\d|22[0-3])(?:\.(?:1?\d{1,2}|2[0-4]\d|25[0-5])){2}(?:\.(?:[1-9]\d?|1\d\d|2[0-4]\d|25[0-4]))|(?:(?:[a-z\u00a1-\uffff0-9]-*)*[a-z\u00a1-\uffff0-9]+)(?:\.(?:[a-z\u00a1-\uffff0-9]-*)*[a-z\u00a1-\uffff0-9]+)*(?:\.(?:[a-z\u00a1-\uffff]{2,})))(?::\d{2,5})?(?:\/\S*)?$/
+	const regexp = /^(?:(?:https?|ftp):\/\/)?(?:(?!(?:10|127)(?:\.\d{1,3}){3})(?!(?:169\.254|192\.168)(?:\.\d{1,3}){2})(?!172\.(?:1[6-9]|2\d|3[0-1])(?:\.\d{1,3}){2})(?:[1-9]\d?|1\d\d|2[01]\d|22[0-3])(?:\.(?:1?\d{1,2}|2[0-4]\d|25[0-5])){2}(?:\.(?:[1-9]\d?|1\d\d|2[0-4]\d|25[0-4]))|(?:(?:[a-z\u00a1-\uffff0-9]-*)*[a-z\u00a1-\uffff0-9]+)(?:\.(?:[a-z\u00a1-\uffff0-9]-*)*[a-z\u00a1-\uffff0-9]+)*(?:\.(?:[a-z\u00a1-\uffff]{2,})))(?::\d{2,5})?(?:\/\S*)?$/
 
 	if (str === '') return true
 	else if (regexp.test(str)) return true

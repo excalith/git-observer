@@ -4,7 +4,9 @@
   "description": "A companion app for developers to reach out Issues, Commits and Pull-Requests on browser through their terminal",
   "main": "cli.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "eslint ./",
+    "precommit": "npm test",
+    "prepush": "npm test"
   },
   "author": "Can Cellek",
   "license": "MIT",
@@ -21,5 +23,9 @@
   "bin": {
     "git-observer": "./cli.js",
     "gob": "./cli.js"
+  },
+  "devDependencies": {
+    "eslint": "^5.1.0",
+    "husky": "^0.14.3"
   }
 }
