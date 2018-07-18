@@ -6,7 +6,7 @@ const chalk = require('chalk')
 const pkg = require('./package.json')
 
 const conf = new Configstore(pkg.name, {
-	isConfirmed: 'No',
+	isConfirmed: 'No'
 })
 
 if (conf.get('isConfirmed') == 'No') {
@@ -86,9 +86,7 @@ function AddProject() {
 				)
 
 				console.log('')
-				console.log(
-					'You have created project ' + chalk.green(answers.projectName),
-				)
+				console.log('You have created project ' + chalk.green(answers.projectName))
 				console.log('')
 			}
 		})
