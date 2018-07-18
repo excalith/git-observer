@@ -9,17 +9,17 @@
 </p>
 
 <p align="center">
-	<a href="https://travis-ci.org/excalith/Git-Observer">
-		<img alt="Build Status" height="18" src="https://img.shields.io/travis/excalith/Git-Observer.svg">
+	<a href="https://travis-ci.org/excalith/git-observer">
+		<img alt="Build Status" height="18" src="https://img.shields.io/travis/excalith/git-observer.svg">
 	</a>
-	<a href="https://github.com/excalith/Git-Observer/issues">
-		<img alt="Build Status" height="18" src="https://img.shields.io/github/issues/excalith/Git-Observer.svg">
+	<a href="https://github.com/excalith/git-observer/issues">
+		<img alt="Build Status" height="18" src="https://img.shields.io/github/issues/excalith/git-observer.svg">
 	</a>
-	<a href="https://github.com/excalith/Git-Observer/stargazers">
-		<img alt="Stars" height="18" src="https://img.shields.io/github/stars/excalith/Git-Observer.svg">
+	<a href="https://github.com/excalith/git-observer/stargazers">
+		<img alt="Stars" height="18" src="https://img.shields.io/github/stars/excalith/git-observer.svg">
 	</a>
-	<a href="https://github.com/excalith/Git-Observer/network">
-		<img alt="Forks" height="18" src="https://img.shields.io/github/forks/excalith/Git-Observer.svg">
+	<a href="https://github.com/excalith/git-observer/network">
+		<img alt="Forks" height="18" src="https://img.shields.io/github/forks/excalith/git-observer.svg">
 	</a>
 </p>
 
