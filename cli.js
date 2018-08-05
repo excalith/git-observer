@@ -207,16 +207,14 @@ function CheckArguments() {
  */
 function openLink(link, linkType, command) {
 	if (link === '') {
-		console.log(linkType + ' not found in project ' + conf.get('lastProject'))
+		console.log(linkType + ' link not set for project ' + chalk.magenta.bold(conf.get('lastProject')))
 	} else {
-		console.log(
-			'Opening ' +
-			linkType +
-			': ' +
-			command +
-			' of project ' +
-			conf.get('lastProject')
-		)
+		if (linkType == 'Issue')
+			console.log('Opening ' + chalk.red.bold('issue #' + command) + ' of project ' + chalk.magenta.bold(conf.get('lastProject')))
+		else if (linkType == 'Commit')
+			console.log('Opening ' + chalk.green.bold('commit #' + command) + ' of project ' + chalk.magenta.bold(conf.get('lastProject')))
+		else
+			console.log('Opening ' + chalk.blue.bold('pull request #' + command) + ' of project ' + chalk.magenta.bold(conf.get('lastProject')))
 		opn(link + command)
 	}
 }
