@@ -157,7 +157,7 @@ function DeleteProject() {
  */
 function ShowHelp() {
 	console.log('')
-	console.log(chalk.white.bold('Git Observer Help'))
+	console.log(chalk.white.bold('Git Observer v' + pkg.version))
 	console.log('')
 	console.log('Commands:')
 	console.log('   -a --add                Add a new project to observer')
