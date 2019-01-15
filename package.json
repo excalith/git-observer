@@ -1,6 +1,6 @@
 {
   "name": "git-observer",
-  "version": "1.1.1",
+  "version": "1.1.2",
   "description": "A companion app for developers to reach out Issues, Commits and Pull-Requests on their favorite browser, without leaving their beloved terminal",
   "main": "cli.js",
   "scripts": {
