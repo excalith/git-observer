@@ -64,7 +64,9 @@ Whenever you create a project, app sets it as default project. You can then run 
 ## How To Contribute
 Please feel free to contribute!
 * [Create issues](https://github.com/excalith/git-observer/issues) for both issues and feature requests
-* Create pull requests for anything listed in issues
+* Create pull requests to **develop** for anything listed in issues
+  * Please use prefixes such as Add, Fix, Update etc. before your commit message
+  * Please be brief about your commit message
 
 ## License
 This project is licensed under the MIT License - see the [LICENSE.md](LICENSE.md) file for details.
