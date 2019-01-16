@@ -5,6 +5,8 @@ const inquirer = require('inquirer')
 const chalk = require('chalk')
 const gitconfig = require('gitconfiglocal')
 const gitUrlParse = require('git-url-parse')
+const checkForUpdate = require('update-check')
+const boxen = require('boxen')
 const pkg = require('./package.json')
 const conf = new Configstore(pkg.name, {
 	currentProject: '',
@@ -67,12 +69,7 @@ function CheckArguments() {
  * Prints commands into terminal
  */
 function ShowHelp() {
-	console.log('')
-	console.log(
-		chalk.green.bold('Git Observer') + chalk.magenta.bold(' v' + pkg.version)
-	)
-	console.log('')
-	console.log('Commands:')
+	console.log(chalk.bold('\nCommands:'))
 	console.log('   -a --add                Add a new project to observer')
 	console.log('   -s --switch             Switch to another project on observer')
 	console.log('   -e --edit               Edit settings file (JSON)')
@@ -83,7 +80,8 @@ function ShowHelp() {
 	console.log('   -p --pull  [Number]     Check pull request on browser')
 	console.log('')
 	console.log('   -h --help               Display this help')
-	console.log('')
+
+	CheckUpdates()
 }
 
 
@@ -363,6 +361,29 @@ function FetchProjects() {
 	})
 
 	return projects
+}
+
+
+/**
+ * Checks for an update and prints info
+ */
+async function CheckUpdates()
+{
+	let update = null
+ 
+	try {
+		update = await checkForUpdate(pkg)
+	} catch (err) {
+		console.log(chalk.red('\nFailed to check for updates:'))
+		console.error(err)
+	}
+	
+	if (update) {
+		let updateText = 'Update available ' + chalk.gray(pkg.version) + ' → ' + chalk.green(update.latest)
+		let commandText = 'Run ' + chalk.cyan('npm i -g ' + pkg.name) + ' to update'
+		console.log(boxen(updateText + '\n' + commandText, {padding: 1, margin: 1, align: 'center'}))
+	}
+
 }
 
 
