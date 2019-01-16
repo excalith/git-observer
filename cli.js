@@ -90,7 +90,6 @@ function ShowHelp() {
 /**
  * Adds a project to store in settings and activates it
  */
-
 function AddProject() {
 	let repoInfo = {}
 
@@ -133,74 +132,113 @@ function AddProject() {
 			repoInfo.prLink = 'https://bitbucket.org/' + repoInfo.owner + '/' + repoInfo.repo + '/pull-requests/'
 			break
 		}
-	
-		console.log(chalk.white.bold('\nSettings will ask for links below.\n'))
 
-		inquirer
-			.prompt([
-				{
-					message: 'Repository Name:',
-					default: repoInfo.repo,
-					type: 'input',
-					name: 'projectName',
-					validate: ValidateString
-				},
-				{
-					message: 'Repository Commits:',
-					default: repoInfo.commitLink,
-					type: 'input',
-					name: 'commitLink',
-					validate: ValidateLink
-				},
-				{
-					message: 'Repository Issues:',
-					default: repoInfo.issueLink,
-					type: 'input',
-					name: 'issueLink',
-					validate: ValidateLink
-				},
-				{
-					message: 'Repository Pull-Requests:',
-					default: repoInfo.prLink,
-					type: 'input',
-					name: 'pullRequestLink',
-					validate: ValidateLink
-				},
-				{
-					message: 'Are your choices correct?',
-					type: 'list',
-					name: 'isConfirmed',
-					choices: ['Yes', 'No']
-				}
-			])
-			.then(answers => {
-				if (answers.isConfirmed == 'No') {
-					AddProject()
-				} else {
-					// conf.set('isConfirmed', true)
-					conf.set('currentProject', answers.projectName)
-	
-					conf.set(
-						'projects.' + answers.projectName + '.commitLink',
-						answers.commitLink
-					)
-					conf.set(
-						'projects.' + answers.projectName + '.issueLink',
-						answers.issueLink
-					)
-					conf.set(
-						'projects.' + answers.projectName + '.pullRequestLink',
-						answers.pullRequestLink
-					)
-	
-					console.log(
-						'\nYou have created project ' +
-							chalk.green(answers.projectName) +
-							'\n'
-					)
-				}
-			})
+		let projects = FetchProjects()
+		let keyExists = (projects.indexOf(repoInfo.repo) > -1)
+
+		
+		if(keyExists) {
+			console.log('\n' + repoInfo.repo + chalk.red.bold(' already exists') +  (' in git-observer database\n'))
+
+			inquirer
+				.prompt([
+					{
+						message: 'Do you want to override?',
+						type: 'list',
+						name: 'projectName',
+						choices: ['Yes', 'No']
+					}
+				])
+				.then(answers => {
+					if (answers.projectName == 'Yes') {
+						SaveProjectEntry(repoInfo)
+					}
+					else
+					{
+						return
+					}
+				})
+		}
+		else
+		{
+			SaveProjectEntry(repoInfo)
+		}
 	})
+}
+
+
+/**
+ * Inquires the user to create a new git-observer entry
+ * @param {repoInfo} repoInfo Display repository info or dummy info
+ */
+function SaveProjectEntry(repoInfo)
+{
+	console.log(chalk.green.bold('\nCreating new git-observer entry\n'))
+
+	inquirer
+		.prompt([
+			{
+				message: 'Repository Name:',
+				default: repoInfo.repo,
+				type: 'input',
+				name: 'projectName',
+				validate: ValidateString
+			},
+			{
+				message: 'Repository Commits:',
+				default: repoInfo.commitLink,
+				type: 'input',
+				name: 'commitLink',
+				validate: ValidateLink
+			},
+			{
+				message: 'Repository Issues:',
+				default: repoInfo.issueLink,
+				type: 'input',
+				name: 'issueLink',
+				validate: ValidateLink
+			},
+			{
+				message: 'Repository Pull-Requests:',
+				default: repoInfo.prLink,
+				type: 'input',
+				name: 'pullRequestLink',
+				validate: ValidateLink
+			},
+			{
+				message: 'Are your choices correct?',
+				type: 'list',
+				name: 'isConfirmed',
+				choices: ['Yes', 'No']
+			}
+		])
+		.then(answers => {
+			if (answers.isConfirmed == 'No') {
+				AddProject()
+			} else {
+				// conf.set('isConfirmed', true)
+				conf.set('currentProject', answers.projectName)
+
+				conf.set(
+					'projects.' + answers.projectName + '.commitLink',
+					answers.commitLink
+				)
+				conf.set(
+					'projects.' + answers.projectName + '.issueLink',
+					answers.issueLink
+				)
+				conf.set(
+					'projects.' + answers.projectName + '.pullRequestLink',
+					answers.pullRequestLink
+				)
+
+				console.log(
+					'\nYou have created project ' +
+						chalk.green(answers.projectName) +
+						'\n'
+				)
+			}
+		})
 }
 
 
@@ -233,12 +271,14 @@ function SwitchToProject() {
 		})
 }
 
+
 /**
  * Open configstore settings file
  **/
 function OpenSettings() {
 	opn(conf.path)
 }
+
 
 /**
  * Shows all projects stored in settings and deletes selected
@@ -269,6 +309,7 @@ function DeleteProject() {
 			}
 		})
 }
+
 
 /**
  * If link is stored in settings, launch on browser. Else display error
@@ -310,6 +351,7 @@ function OpenLink(link, linkType, id) {
 	}
 }
 
+
 /**
  * Fetch all projects stored in Git-Observer settings
  */
@@ -324,7 +366,6 @@ function FetchProjects() {
 }
 
 
-
 /**
  * Validates string
  * @param  {String} str String to validate
@@ -332,6 +373,7 @@ function FetchProjects() {
 function ValidateString(str) {
 	return str !== ''
 }
+
 
 /**
  * Validates link
