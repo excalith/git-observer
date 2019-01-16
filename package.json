@@ -1,7 +1,7 @@
 {
   "name": "git-observer",
   "version": "1.1.2",
-  "description": "A companion app for developers to reach out Issues, Commits and Pull-Requests on their favorite browser, without leaving their beloved terminal",
+  "description": "A companion app for developers to reach out Issues, Commits and Pull-Requests on their browser, without leaving their beloved terminal",
   "main": "cli.js",
   "scripts": {
     "test": "eslint ./",
@@ -13,6 +13,8 @@
   "dependencies": {
     "chalk": "^2.4.2",
     "configstore": "^4.0.0",
+    "git-url-parse": "^11.1.2",
+    "gitconfiglocal": "^2.0.2",
     "inquirer": "^6.2.1",
     "opn": "^5.4.0"
   },

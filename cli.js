@@ -3,6 +3,8 @@ const opn = require('opn')
 const Configstore = require('configstore')
 const inquirer = require('inquirer')
 const chalk = require('chalk')
+const gitconfig = require('gitconfiglocal')
+const gitUrlParse = require('git-url-parse')
 const pkg = require('./package.json')
 const conf = new Configstore(pkg.name, {
 	currentProject: '',
@@ -14,7 +16,7 @@ const conf = new Configstore(pkg.name, {
 if (FetchProjects().length > 0)
 {
 	// If everything is in order
-	if (ValidateString(conf.get('currentProject'))) 
+	if (ValidateString(conf.get('currentProject')))
 	{
 		CheckArguments()
 	}
@@ -22,7 +24,7 @@ if (FetchProjects().length > 0)
 	else
 	{
 		console.log(chalk.red.bold('\nLast project not found, please select another project\n'))
-		GetProjects()
+		SwitchToProject()
 	}
 }
 // If settings doesn't have any project entry
@@ -30,7 +32,6 @@ else
 {
 	AddProject()
 }
-
 
 /**
  * Checks all arguments given from terminal
@@ -51,28 +52,29 @@ function CheckArguments() {
 		OpenLink(prLink, 'Pull-Request', command)
 	} else if (type == '-a' || type == '--add') {
 		AddProject()
-	} else if (type == '-g' || type == '--get') {
-		GetProjects()
-	} else if (type == '-e' || type == '--edit') {
-		OpenSettings()
+	} else if (type == '-s' || type == '--switch') {
+		SwitchToProject()
 	} else if (type == '-d' || type == '--delete') {
 		DeleteProject()
+	} else if (type == '-e' || type == '--edit') {
+		OpenSettings()
 	} else {
 		ShowHelp()
 	}
 }
-
 
 /**
  * Prints commands into terminal
  */
 function ShowHelp() {
 	console.log('')
-	console.log(chalk.green.bold('Git Observer') + chalk.magenta.bold(' v' + pkg.version))
+	console.log(
+		chalk.green.bold('Git Observer') + chalk.magenta.bold(' v' + pkg.version)
+	)
 	console.log('')
 	console.log('Commands:')
 	console.log('   -a --add                Add a new project to observer')
-	console.log('   -g --get                Get all projects on observer')
+	console.log('   -s --switch             Switch to another project on observer')
 	console.log('   -e --edit               Edit settings file (JSON)')
 	console.log('   -d --delete             Delete a project from observer')
 	console.log('')
@@ -88,80 +90,124 @@ function ShowHelp() {
 /**
  * Adds a project to store in settings and activates it
  */
+
 function AddProject() {
-	console.log(chalk.white.bold('\nSettings will ask for links below.\n'))
-	console.log(
-		chalk.white.bold('Project Commits Example: ') +
-		'https://github.com/User/RepoName/commit/')
-	console.log(
-		chalk.white.bold('Project Issues Example: ') +
-		'https://github.com/User/RepoName/issues/')
-	console.log(
-		chalk.white.bold('Project Issues Example: ') +
-		'https://github.com/User/RepoName/pull/\n')
-	inquirer
-		.prompt([
-			{
-				message: 'Project Name:',
-				type: 'input',
-				name: 'projectName',
-				validate: ValidateString
-			},
-			{
-				message: 'Project Commits:',
-				type: 'input',
-				name: 'commitLink',
-				validate: ValidateLink
-			},
-			{
-				message: 'Project Issues:',
-				type: 'input',
-				name: 'issueLink',
-				validate: ValidateLink
-			},
-			{
-				message: 'Project Pull-Requests:',
-				type: 'input',
-				name: 'pullRequestLink',
-				validate: ValidateLink
-			},
-			{
-				message: 'Are your choices correct?',
-				type: 'list',
-				name: 'isConfirmed',
-				choices: ['Yes', 'No']
-			},
-		])
-		.then(answers => {
-			if (answers.isConfirmed == 'No') {
-				AddProject()
-			} else {
-				// conf.set('isConfirmed', true)
-				conf.set('currentProject', answers.projectName)
+	let repoInfo = {}
 
-				conf.set(
-					'projects.' + answers.projectName + '.commitLink',
-					answers.commitLink
-				)
-				conf.set(
-					'projects.' + answers.projectName + '.issueLink',
-					answers.issueLink
-				)
-				conf.set(
-					'projects.' + answers.projectName + '.pullRequestLink',
-					answers.pullRequestLink
-				)
+	// Check if folder have git config file or not
+	gitconfig('./', function(err, config) {
+		// If git config not found, pass example values
+		if (err) 
+		{
+			repoInfo.service = 'github.com'
+			repoInfo.owner = 'owner'
+			repoInfo.repo = 'repo-name'
+		}
+		// If git config found, fill repoInfo with required info
+		else
+		{
+			let data = gitUrlParse(config.remote.origin.url)
 
-				console.log('\nYou have created project ' + chalk.green(answers.projectName) + '\n')
-			}
-		})
+			repoInfo.service = data.resource
+			repoInfo.owner = data.owner
+			repoInfo.repo = data.name
+		}
+
+		// Generate links depending on service
+		switch (repoInfo.service) {
+		case 'github.com':
+			repoInfo.commitLink = 'https://github.com/' + repoInfo.owner + '/' + repoInfo.repo + '/commit/',
+			repoInfo.issueLink = 'https://github.com/' + repoInfo.owner + '/' + repoInfo.repo + '/issues/',
+			repoInfo.prLink = 'https://github.com/' + repoInfo.owner + '/' + repoInfo.repo + '/pull/'
+			break
+	
+		case 'gitlab.com':
+			repoInfo.commitLink = 'https://gitlab.com/' + repoInfo.owner + '/' + repoInfo.repo + '/commit/'
+			repoInfo.issueLink = 'https://gitlab.com/' + repoInfo.owner + '/' + repoInfo.repo + '/issues/'
+			repoInfo.prLink = 'https://gitlab.com/' + repoInfo.owner + '/' + repoInfo.repo + '/merge_requests/'
+			break
+	
+		case 'bitbucket.org':
+			repoInfo.commitLink = 'https://bitbucket.org/' + repoInfo.owner + '/' + repoInfo.repo + '/commits/'
+			repoInfo.issueLink = 'https://bitbucket.org/' + repoInfo.owner + '/' + repoInfo.repo + '/issues/'
+			repoInfo.prLink = 'https://bitbucket.org/' + repoInfo.owner + '/' + repoInfo.repo + '/pull-requests/'
+			break
+		}
+	
+		console.log(chalk.white.bold('\nSettings will ask for links below.\n'))
+
+		inquirer
+			.prompt([
+				{
+					message: 'Repository Name:',
+					default: repoInfo.repo,
+					type: 'input',
+					name: 'projectName',
+					validate: ValidateString
+				},
+				{
+					message: 'Repository Commits:',
+					default: repoInfo.commitLink,
+					type: 'input',
+					name: 'commitLink',
+					validate: ValidateLink
+				},
+				{
+					message: 'Repository Issues:',
+					default: repoInfo.issueLink,
+					type: 'input',
+					name: 'issueLink',
+					validate: ValidateLink
+				},
+				{
+					message: 'Repository Pull-Requests:',
+					default: repoInfo.prLink,
+					type: 'input',
+					name: 'pullRequestLink',
+					validate: ValidateLink
+				},
+				{
+					message: 'Are your choices correct?',
+					type: 'list',
+					name: 'isConfirmed',
+					choices: ['Yes', 'No']
+				}
+			])
+			.then(answers => {
+				if (answers.isConfirmed == 'No') {
+					AddProject()
+				} else {
+					// conf.set('isConfirmed', true)
+					conf.set('currentProject', answers.projectName)
+	
+					conf.set(
+						'projects.' + answers.projectName + '.commitLink',
+						answers.commitLink
+					)
+					conf.set(
+						'projects.' + answers.projectName + '.issueLink',
+						answers.issueLink
+					)
+					conf.set(
+						'projects.' + answers.projectName + '.pullRequestLink',
+						answers.pullRequestLink
+					)
+	
+					console.log(
+						'\nYou have created project ' +
+							chalk.green(answers.projectName) +
+							'\n'
+					)
+				}
+			})
+	})
 }
 
 
 /**
  * Shows all projects stored in settings and activates selected
  */
-function GetProjects() {
+function SwitchToProject() {
 	let projects = FetchProjects()
 	projects.push(new inquirer.Separator())
 	projects.push('Exit')
@@ -173,18 +219,19 @@ function GetProjects() {
 				type: 'list',
 				name: 'projectName',
 				choices: projects
-			},
+			}
 		])
 		.then(answers => {
 			if (answers.projectName == 'Exit') {
 				console.log('\nYou didn\'t select a project\n')
 			} else {
 				conf.set('currentProject', answers.projectName)
-				console.log('\nYou have selected ' + chalk.green(answers.projectName) + '\n')
+				console.log(
+					'\nYou have selected ' + chalk.green(answers.projectName) + '\n'
+				)
 			}
 		})
 }
-
 
 /**
  * Open configstore settings file
@@ -192,7 +239,6 @@ function GetProjects() {
 function OpenSettings() {
 	opn(conf.path)
 }
-
 
 /**
  * Shows all projects stored in settings and deletes selected
@@ -208,7 +254,7 @@ function DeleteProject() {
 				type: 'list',
 				name: 'projectName',
 				choices: projects
-			},
+			}
 		])
 		.then(answers => {
 			if (answers.projectName == 'Exit') {
@@ -217,12 +263,12 @@ function DeleteProject() {
 				conf.delete('projects.' + answers.projectName)
 				console.log(
 					'You have deleted ' +
-					chalk.red(answers.projectName) +
-					' from settings\n')
+						chalk.red(answers.projectName) +
+						' from settings\n'
+				)
 			}
 		})
 }
-
 
 /**
  * If link is stored in settings, launch on browser. Else display error
@@ -232,19 +278,37 @@ function DeleteProject() {
  */
 function OpenLink(link, linkType, id) {
 	if (link === '') {
-		console.log(linkType + ' link not set for project ' + chalk.magenta.bold(conf.get('currentProject')))
+		console.log(
+			linkType +
+				' link not set for project ' +
+				chalk.magenta.bold(conf.get('currentProject'))
+		)
 	} else {
 		if (linkType == 'Issue')
-			console.log('Opening ' + chalk.red.bold('issue #' + id) + ' of project ' + chalk.magenta.bold(conf.get('currentProject')))
+			console.log(
+				'Opening ' +
+					chalk.red.bold('issue #' + id) +
+					' of project ' +
+					chalk.magenta.bold(conf.get('currentProject'))
+			)
 		else if (linkType == 'Commit')
-			console.log('Opening ' + chalk.green.bold('commit #' + id) + ' of project ' + chalk.magenta.bold(conf.get('currentProject')))
+			console.log(
+				'Opening ' +
+					chalk.green.bold('commit #' + id) +
+					' of project ' +
+					chalk.magenta.bold(conf.get('currentProject'))
+			)
 		else
-			console.log('Opening ' + chalk.blue.bold('pull request #' + id) + ' of project ' + chalk.magenta.bold(conf.get('currentProject')))
+			console.log(
+				'Opening ' +
+					chalk.blue.bold('pull request #' + id) +
+					' of project ' +
+					chalk.magenta.bold(conf.get('currentProject'))
+			)
 
 		opn(link + id)
 	}
 }
-
 
 /**
  * Fetch all projects stored in Git-Observer settings
@@ -258,6 +322,7 @@ function FetchProjects() {
 
 	return projects
 }
+
 
 
 /**
