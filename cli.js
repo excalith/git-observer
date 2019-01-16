@@ -95,8 +95,8 @@ function AddProject() {
 
 	// Check if folder have git config file or not
 	gitconfig('./', function(err, config) {
-		// If git config not found, pass example values
-		if (err) 
+		// If git config not found or initialized repo doesn't have remote, pass example values
+		if (err || config.hasOwnProperty('remote') === false) 
 		{
 			repoInfo.service = 'github.com'
 			repoInfo.owner = 'owner'
