@@ -13,25 +13,20 @@ const conf = new Configstore(pkg.name, {
 	projects: {}
 })
 
-
 // If settings have at least 1 project entry
-if (FetchProjects().length > 0)
-{
+if (FetchProjects().length > 0) {
 	// If everything is in order
-	if (ValidateString(conf.get('currentProject')))
-	{
+	if (ValidateString(conf.get('currentProject'))) {
 		CheckArguments()
 	}
 	// If we do not have current project set
-	else
-	{
+	else {
 		console.log(chalk.red.bold('\nLast project not found, please select another project\n'))
 		SwitchToProject()
 	}
 }
 // If settings doesn't have any project entry
-else
-{
+else {
 	AddProject()
 }
 
@@ -84,7 +79,6 @@ function ShowHelp() {
 	CheckUpdates()
 }
 
-
 /**
  * Adds a project to store in settings and activates it
  */
@@ -94,15 +88,13 @@ function AddProject() {
 	// Check if folder have git config file or not
 	gitconfig('./', function(err, config) {
 		// If git config not found or initialized repo doesn't have remote, pass example values
-		if (err || config.hasOwnProperty('remote') === false) 
-		{
+		if (err || config.hasOwnProperty('remote') === false) {
 			repoInfo.service = 'github.com'
 			repoInfo.owner = 'owner'
 			repoInfo.repo = 'repo-name'
 		}
 		// If git config found, fill repoInfo with required info
-		else
-		{
+		else {
 			let data = gitUrlParse(config.remote.origin.url)
 
 			repoInfo.service = data.resource
@@ -117,13 +109,13 @@ function AddProject() {
 			repoInfo.issueLink = 'https://github.com/' + repoInfo.owner + '/' + repoInfo.repo + '/issues/',
 			repoInfo.prLink = 'https://github.com/' + repoInfo.owner + '/' + repoInfo.repo + '/pull/'
 			break
-	
+
 		case 'gitlab.com':
 			repoInfo.commitLink = 'https://gitlab.com/' + repoInfo.owner + '/' + repoInfo.repo + '/commit/'
 			repoInfo.issueLink = 'https://gitlab.com/' + repoInfo.owner + '/' + repoInfo.repo + '/issues/'
 			repoInfo.prLink = 'https://gitlab.com/' + repoInfo.owner + '/' + repoInfo.repo + '/merge_requests/'
 			break
-	
+
 		case 'bitbucket.org':
 			repoInfo.commitLink = 'https://bitbucket.org/' + repoInfo.owner + '/' + repoInfo.repo + '/commits/'
 			repoInfo.issueLink = 'https://bitbucket.org/' + repoInfo.owner + '/' + repoInfo.repo + '/issues/'
@@ -132,11 +124,10 @@ function AddProject() {
 		}
 
 		let projects = FetchProjects()
-		let keyExists = (projects.indexOf(repoInfo.repo) > -1)
+		let keyExists = projects.indexOf(repoInfo.repo) > -1
 
-		
-		if(keyExists) {
-			console.log('\n' + repoInfo.repo + chalk.red.bold(' already exists') +  (' in git-observer database\n'))
+		if (keyExists) {
+			console.log('\n' + repoInfo.repo + chalk.red.bold(' already exists') + ' in git-observer database\n')
 
 			inquirer
 				.prompt([
@@ -150,27 +141,21 @@ function AddProject() {
 				.then(answers => {
 					if (answers.projectName == 'Yes') {
 						SaveProjectEntry(repoInfo)
-					}
-					else
-					{
+					} else {
 						return
 					}
 				})
-		}
-		else
-		{
+		} else {
 			SaveProjectEntry(repoInfo)
 		}
 	})
 }
 
-
 /**
  * Inquires the user to create a new git-observer entry
  * @param {repoInfo} repoInfo Display repository info or dummy info
  */
-function SaveProjectEntry(repoInfo)
-{
+function SaveProjectEntry(repoInfo) {
 	console.log(chalk.green.bold('\nCreating new git-observer entry\n'))
 
 	inquirer
@@ -232,13 +217,11 @@ function SaveProjectEntry(repoInfo)
 
 				console.log(
 					'\nYou have created project ' +
-						chalk.green(answers.projectName) +
-						'\n'
+						chalk.green(answers.projectName)
 				)
 			}
 		})
 }
-
 
 /**
  * Shows all projects stored in settings and activates selected
@@ -263,20 +246,19 @@ function SwitchToProject() {
 			} else {
 				conf.set('currentProject', answers.projectName)
 				console.log(
-					'\nYou have selected ' + chalk.green(answers.projectName) + '\n'
+					'\nYou have selected ' + chalk.green(answers.projectName)
 				)
 			}
 		})
 }
 
-
 /**
  * Open configstore settings file
  **/
 function OpenSettings() {
-	opn(conf.path)
+	console.log('Opening settings file: ' + chalk.magenta.bold(conf.path))
+	opn(conf.path, { wait: false })
 }
-
 
 /**
  * Shows all projects stored in settings and deletes selected
@@ -302,12 +284,11 @@ function DeleteProject() {
 				console.log(
 					'You have deleted ' +
 						chalk.red(answers.projectName) +
-						' from settings\n'
+						' from settings'
 				)
 			}
 		})
 }
-
 
 /**
  * If link is stored in settings, launch on browser. Else display error
@@ -345,10 +326,9 @@ function OpenLink(link, linkType, id) {
 					chalk.magenta.bold(conf.get('currentProject'))
 			)
 
-		opn(link + id)
+		opn(link + id, { wait: false })
 	}
 }
-
 
 /**
  * Fetch all projects stored in Git-Observer settings
@@ -363,29 +343,32 @@ function FetchProjects() {
 	return projects
 }
 
-
 /**
  * Checks for an update and prints info
  */
-async function CheckUpdates()
-{
+async function CheckUpdates() {
 	let update = null
- 
+
 	try {
 		update = await checkForUpdate(pkg)
 	} catch (err) {
 		console.log(chalk.red('\nFailed to check for updates:'))
 		console.error(err)
 	}
-	
+
 	if (update) {
 		let updateText = 'Update available ' + chalk.gray(pkg.version) + ' → ' + chalk.green(update.latest)
 		let commandText = 'Run ' + chalk.cyan('npm i -g ' + pkg.name) + ' to update'
-		console.log(boxen(updateText + '\n' + commandText, {padding: 1, margin: 1, align: 'center'}))
+
+		console.log(
+			boxen(updateText + '\n' + commandText, {
+				padding: 1,
+				margin: 1,
+				align: 'center'
+			})
+		)
 	}
-
 }
-
 
 /**
  * Validates string
@@ -394,7 +377,6 @@ async function CheckUpdates()
 function ValidateString(str) {
 	return str !== ''
 }
-
 
 /**
  * Validates link
