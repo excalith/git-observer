@@ -55,6 +55,8 @@ function CheckArguments() {
 		DeleteProject()
 	} else if (type == '-e' || type == '--edit') {
 		OpenSettings()
+	} else if (type == '-u' || type == '--update') {
+		CheckUpdates()
 	} else {
 		ShowHelp()
 	}
@@ -74,9 +76,8 @@ function ShowHelp() {
 	console.log('   -c --commit  [Hash]     Check commit on browser')
 	console.log('   -p --pull  [Number]     Check pull request on browser')
 	console.log('')
+	console.log('   -u --update             Check for updates')
 	console.log('   -h --help               Display this help')
-
-	CheckUpdates()
 }
 
 /**
@@ -356,18 +357,25 @@ async function CheckUpdates() {
 		console.error(err)
 	}
 
-	if (update) {
-		let updateText = 'Update available ' + chalk.gray(pkg.version) + ' → ' + chalk.green(update.latest)
-		let commandText = 'Run ' + chalk.cyan('npm i -g ' + pkg.name) + ' to update'
+	let updateText, commandText
 
-		console.log(
-			boxen(updateText + '\n' + commandText, {
-				padding: 1,
-				margin: 1,
-				align: 'center'
-			})
-		)
+	if (update) {
+		updateText = 'Update available ' + chalk.gray(pkg.version) + ' → ' + chalk.green(update.latest)
+		commandText = 'Run ' + chalk.cyan('npm i -g ' + pkg.name) + ' to update'
 	}
+	else
+	{
+		updateText = 'You are using the latest version'
+		commandText = pkg.name + ' v' + pkg.version
+	}
+
+	console.log(
+		boxen(updateText + '\n' + commandText, {
+			padding: 1,
+			margin: 1,
+			align: 'center'
+		})
+	)
 }
 
 /**

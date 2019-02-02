@@ -73,6 +73,7 @@ Whenever you create a project, app sets it as default project. You can then run 
 | gob -i --issue [Number] | Open issue on browser                     |
 | gob -c --commit [Hash]  | Open commit on browser                    |
 | gob -p --pull [Number]  | Open pull request on browser              |
+| gob -u --update         | Check for updates                         |
 | gob -h --help           | Show help                                 |
 
 ## How To Contribute
